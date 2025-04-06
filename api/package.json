@@ -1,0 +1,9 @@
+{
+  "name": "perobot-api",
+  "version": "1.0.0",
+  "description": "PeroBot API functions",
+  "type": "module",
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  }
+}

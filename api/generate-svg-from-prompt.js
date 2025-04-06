@@ -1,5 +1,5 @@
 // Serverless function for Vercel to generate SVG from text prompt
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 // Function to call Gemini API
 async function callGeminiAPI(prompt, apiKey) {
@@ -32,6 +32,9 @@ async function callGeminiAPI(prompt, apiKey) {
   };
 
   try {
+    console.log('Calling Gemini API with URL:', url);
+    console.log('Request body:', JSON.stringify(requestBody));
+
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -39,6 +42,8 @@ async function callGeminiAPI(prompt, apiKey) {
       },
       body: JSON.stringify(requestBody),
     });
+
+    console.log('Gemini API response status:', response.status);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -66,7 +71,7 @@ async function callGeminiAPI(prompt, apiKey) {
 }
 
 // Vercel API handler
-module.exports = async (req, res) => {
+export default async (req, res) => {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -88,8 +93,12 @@ module.exports = async (req, res) => {
   }
 
   try {
+    console.log('Request received:', req.method, req.url);
+
     // Parse request body
     const { prompt, apiKey } = req.body;
+    console.log('Prompt received:', prompt ? 'Yes' : 'No');
+    console.log('API Key received:', apiKey ? 'Yes (length: ' + apiKey.length + ')' : 'No');
 
     if (!prompt) {
       return res.status(400).json({ error: 'Prompt is required' });
