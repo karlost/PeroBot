@@ -35,7 +35,7 @@ export function useGeminiSvgGenerator() {
           {
             parts: [
               {
-                text: `Create a minimalist black and white lineart illustration of ${prompt}. Use PeroBot style: bold continuous lines, high contrast, and artistic composition suitable for wall art. The design should have clear shapes with solid black areas on white background, optimized for vectorization. Avoid thin lines, gradients, or grayscale. The illustration should be simple but detailed enough to clearly represent ${prompt}. Make the design suitable for printing as wall decoration.`
+                text: `Create a minimalist black and white lineart illustration of ${prompt}, contained within a perfect circle with thick border. Use clean continuous lines suitable for 3D printing as wall art with bold outlines, negative space, and the same graphic style as the reference image - high contrast, simplified shapes, and subtle background elements to create depth. The ${prompt} should be the main focus in the center of the circular composition.`
               }
             ]
           }
