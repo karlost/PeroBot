@@ -30,7 +30,7 @@ export function useGeminiSvgGenerator() {
       if (isDevelopment && false) { // Set to false to always use serverless function
         // DEVELOPMENT MODE - Call Gemini API directly (for testing only)
         console.log('DEV MODE: Calling Gemini API directly for testing purposes')
-        
+
         // Direct API call implementation
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key=${apiKey.value}`
 
@@ -68,7 +68,7 @@ export function useGeminiSvgGenerator() {
         if (apiData.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data) {
           imageBase64 = apiData.candidates[0].content.parts[0].inlineData.data
           generatedImageBase64.value = `data:image/png;base64,${imageBase64}`
-          
+
           // Try to convert using local potrace server
           try {
             const potraceResponse = await fetch('http://localhost:3000/api/convert-to-svg', {
@@ -107,31 +107,49 @@ export function useGeminiSvgGenerator() {
       } else {
         // PRODUCTION MODE - Use serverless function
         console.log('PROD MODE: Using serverless function to generate SVG')
-        
+
         // Determine which serverless function endpoint to use based on deployment platform
         const apiEndpoint = window.location.hostname.includes('netlify')
           ? '/.netlify/functions/generate-svg-from-prompt'
           : '/api/generate-svg-from-prompt';
-        
+
         console.log('Using API endpoint:', apiEndpoint);
-        
-        const serverResponse = await fetch(apiEndpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            prompt,
-            apiKey: apiKey.value
-          }),
-        })
-        
-        if (!serverResponse.ok) {
-          const errorText = await serverResponse.text()
-          throw new Error(`Server error: ${serverResponse.status} ${errorText}`)
+
+        let serverData;
+        try {
+          console.log('Calling API endpoint with timeout:', apiEndpoint);
+
+          // Use AbortController to set a timeout
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
+          const serverResponse = await fetch(apiEndpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              prompt,
+              apiKey: apiKey.value
+            }),
+            signal: controller.signal
+          })
+
+          clearTimeout(timeoutId);
+
+          if (!serverResponse.ok) {
+            const errorText = await serverResponse.text()
+            console.error(`Server error: ${serverResponse.status} ${errorText}`);
+            // Don't throw, use fallback instead
+            return createFallbackSvg(prompt);
+          }
+
+          serverData = await serverResponse.json();
+          console.log('Server response:', serverData);
+        } catch (error) {
+          console.error('Error calling API endpoint:', error);
+          // Use fallback SVG on error
+          return createFallbackSvg(prompt);
         }
-        
-        const serverData = await serverResponse.json()
-        console.log('Server response:', serverData)
-        
+
         if (serverData.svgContent) {
           console.log('SVG content received from server')
           svgContent = serverData.svgContent
@@ -139,7 +157,7 @@ export function useGeminiSvgGenerator() {
           console.log('Image data received from server, creating SVG wrapper')
           imageBase64 = serverData.imageData
           generatedImageBase64.value = `data:image/png;base64,${imageBase64}`
-          
+
           // Create SVG wrapper for the image
           svgContent = `
             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512">
@@ -150,7 +168,7 @@ export function useGeminiSvgGenerator() {
           throw new Error('No image or SVG data received from the server')
         }
       }
-      
+
       return svgContent
     } catch (error) {
       console.error('Error generating SVG:', error)
@@ -160,7 +178,7 @@ export function useGeminiSvgGenerator() {
       isGenerating.value = false
     }
   }
-  
+
   // Helper function to create a fallback SVG
   function createFallbackSvg(prompt: string): string {
     return `
@@ -176,7 +194,7 @@ export function useGeminiSvgGenerator() {
       </svg>
     `.trim()
   }
-  
+
   // Helper function to create an error SVG
   function createErrorSvg(prompt: string, errorMessage: string): string {
     return `

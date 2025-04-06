@@ -11,7 +11,7 @@
   "routes": [
     {
       "src": "/api/generate-svg-from-prompt",
-      "dest": "/api/generate-svg-from-prompt.edge"
+      "dest": "/api/static-svg"
     }
   ]
 }
