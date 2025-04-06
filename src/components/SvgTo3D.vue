@@ -24,7 +24,6 @@ const isExporting = ref<boolean>(false)
 
 // AI SVG Generation state
 const promptText = ref('')
-const isGenerating = ref(false)
 const generatedImageData = ref('')
 
 // 使用 useModelSize composable
@@ -104,7 +103,6 @@ async function handleGenerateSvg() {
     return
   }
 
-  isGenerating.value = true
   generatedImageBase64.value = '' // Reset image
 
   try {
@@ -126,8 +124,6 @@ async function handleGenerateSvg() {
     console.log('SVG mounted, shapes:', svgShapes.value.length)
   } catch (error) {
     console.error('Failed to generate SVG:', error)
-  } finally {
-    isGenerating.value = false
   }
 }
 
@@ -248,7 +244,7 @@ function handleColorChange(index: number, color: string) {
           type="password"
           placeholder="Enter your Gemini API key"
           class="w-full p-2 border rounded"
-          :disabled="isGenerating"
+          :disabled="isGeneratingSvg"
         />
         <div class="text-xs text-gray-500">
           Get your API key from <a href="https://ai.google.dev/" target="_blank" class="text-blue-500 underline">Google AI Studio</a>
@@ -263,7 +259,7 @@ function handleColorChange(index: number, color: string) {
           v-model="promptText"
           placeholder="Describe what you want to generate..."
           class="w-full p-2 border rounded min-h-20 resize-y"
-          :disabled="isGenerating"
+          :disabled="isGeneratingSvg"
         ></textarea>
       </div>
 
@@ -271,10 +267,10 @@ function handleColorChange(index: number, color: string) {
       <button
         @click="handleGenerateSvg"
         class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
-        :disabled="!promptText.trim() || !apiKey.trim() || isGenerating"
+        :disabled="!promptText.trim() || !apiKey.trim() || isGeneratingSvg"
       >
-        <span v-if="isGenerating" class="i-iconoir-loading-alt animate-spin mr-2"></span>
-        {{ isGenerating ? 'Generating...' : 'Generate SVG' }}
+        <span v-if="isGeneratingSvg" class="i-iconoir-loading-alt animate-spin mr-2"></span>
+        {{ isGeneratingSvg ? 'Generating...' : 'Generate SVG' }}
       </button>
 
       <!-- Error Message -->
