@@ -92,16 +92,6 @@ Server bude dostupný na portu 3000.
 
 Tento projekt je licencován pod MIT licencí.
 
-## Sponsors
+## Poděkování
 
-<p align="center">
-  <a href="https://github.com/sponsors/LittleSound">
-    <img src="https://cdn.jsdelivr.net/gh/littlesound/sponsors/sponsors.svg"/>
-  </a>
-</p>
-
-<p align="center">
-  This project is made possible by all the sponsors supporting my work <br>
-  You can join them at my sponsors profile:
-</p>
-<p align="center"><a href="https://github.com/sponsors/LittleSound"><img src="https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86&style=for-the-badge" /></a></p>
+PeroBot je založen na projektu [Bekuto3D](https://github.com/LittleSound/bekuto3d) od [LittleSound](https://github.com/LittleSound).
