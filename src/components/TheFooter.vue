@@ -7,7 +7,7 @@
     <a
       i-carbon-logo-github icon-btn
       rel="noreferrer"
-      href="https://github.com/LittleSound/bekuto3d"
+      href="https://github.com/karlost/PeroBot"
       target="_blank"
       title="GitHub"
     />
