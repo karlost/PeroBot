@@ -1,0 +1,4 @@
+{
+  "runtime": "edge",
+  "entrypoint": "generate-svg-from-prompt.edge.js"
+}
