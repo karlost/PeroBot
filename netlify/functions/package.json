@@ -1,0 +1,14 @@
+{
+  "name": "bekuto3d-netlify-functions",
+  "version": "1.0.0",
+  "description": "Serverless functions for bekuto3d",
+  "type": "module",
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "jimp": "^1.6.0",
+    "node-fetch": "^3.3.2",
+    "potrace": "^2.1.8"
+  }
+}

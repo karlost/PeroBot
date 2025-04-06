@@ -1,0 +1,57 @@
+{
+  "name": "three-3mf-exporter",
+  "type": "module",
+  "version": "0.0.3",
+  "description": "3MF Exporter for Three.js",
+  "author": "Rizumu Ayaka <rizumu@ayaka.moe>",
+  "license": "MIT",
+  "homepage": "https://github.com/littlesound/bekuto3d#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/littlesound/bekuto3d.git",
+    "directory": "packages/3mf-exporter"
+  },
+  "bug": "https://github.com/littlesound/bekuto3d/issues",
+  "keywords": [
+    "3mf",
+    "3d-printer",
+    "three",
+    "three.js",
+    "javascript",
+    "3d",
+    "virtual-reality",
+    "augmented-reality",
+    "webgl",
+    "webgl2",
+    "webaudio",
+    "webgpu",
+    "webxr",
+    "canvas",
+    "svg",
+    "html5"
+  ],
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "unbuild",
+    "stub": "unbuild --stub"
+  },
+  "peerDependencies": {
+    "three": "*"
+  },
+  "dependencies": {
+    "fast-xml-parser": "^5.0.9",
+    "jszip": "^3.10.1"
+  }
+}

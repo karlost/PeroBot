@@ -1,0 +1,301 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+================================================================
+File Summary
+================================================================
+
+Purpose:
+--------
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+
+File Format:
+------------
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Multiple file entries, each consisting of:
+  a. A separator line (================)
+  b. The file path (File: path/to/file)
+  c. Another separator line
+  d. The full contents of the file
+  e. A blank line
+
+Usage Guidelines:
+-----------------
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+
+Notes:
+------
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+
+Additional Info:
+----------------
+
+================================================================
+Directory Structure
+================================================================
+generate-svg-from-prompt.js
+hello-world.js
+package.json
+server.js
+
+================================================================
+Files
+================================================================
+
+================
+File: generate-svg-from-prompt.js
+================
+// Simplified serverless function to generate SVG from text prompt
+const fetch = require('node-fetch');
+
+// Function to call Gemini API
+async function callGeminiAPI(prompt, apiKey) {
+  // Použít API klíč z parametru nebo z proměnné prostředí
+  const key = apiKey || process.env.GEMINI_API_KEY;
+
+  if (!key) {
+    throw new Error('Gemini API key is required but not provided');
+  }
+
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key=${key}`;
+
+  const requestBody = {
+    contents: [
+      {
+        parts: [
+          {
+            text: `Create a minimalist black and white lineart illustration of ${prompt}, contained within a perfect circle with thick border. Use clean continuous lines suitable for 3D printing as wall art with bold outlines, negative space, and high contrast, simplified shapes. The ${prompt} should be the main focus in the center of the circular composition.`
+          }
+        ]
+      }
+    ],
+    generationConfig: {
+      temperature: 0.4,
+      topK: 32,
+      topP: 1,
+      maxOutputTokens: 8192,
+      responseModalities: ["Text", "Image"]
+    }
+  };
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Gemini API error: ${response.status} ${errorText}`);
+    }
+
+    const data = await response.json();
+
+    // Extract base64 image data from response
+    if (data.candidates &&
+        data.candidates[0] &&
+        data.candidates[0].content &&
+        data.candidates[0].content.parts &&
+        data.candidates[0].content.parts[0] &&
+        data.candidates[0].content.parts[0].inlineData &&
+        data.candidates[0].content.parts[0].inlineData.data) {
+      return data.candidates[0].content.parts[0].inlineData.data;
+    } else {
+      throw new Error('No image data found in Gemini API response');
+    }
+  } catch (error) {
+    console.error('Error calling Gemini API:', error);
+    throw error;
+  }
+}
+
+// Main handler function
+exports.handler = async function(event, context) {
+  // Only allow POST requests
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      body: JSON.stringify({ error: 'Method Not Allowed' }),
+    };
+  }
+
+  try {
+    // Parse request body
+    const { prompt, apiKey } = JSON.parse(event.body);
+
+    if (!prompt) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'Prompt is required' }),
+      };
+    }
+
+    // Call Gemini API to generate image
+    const base64ImageData = await callGeminiAPI(prompt, apiKey);
+
+    // Vytvořit jednoduché SVG s kruhem a textem
+    // V produkčním prostředí by se měl použít potrace pro převod PNG na vektorové SVG
+    const svgContent = `
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+        <circle cx="100" cy="100" r="90" fill="white" stroke="black" stroke-width="2"/>
+        <text x="100" y="80" font-family="Arial" font-size="12" text-anchor="middle" dominant-baseline="middle">
+          Generated image for:
+        </text>
+        <text x="100" y="100" font-family="Arial" font-size="12" text-anchor="middle" dominant-baseline="middle">
+          "${prompt}"
+        </text>
+        <path d="M50,125 C50,125 100,175 150,125" stroke="black" fill="none" stroke-width="2"/>
+      </svg>
+    `;
+
+    return {
+      statusCode: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        svgContent: svgContent.trim(),
+        imageData: base64ImageData
+      }),
+    };
+  } catch (error) {
+    console.error('Error in serverless function:', error);
+
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: error.message }),
+    };
+  }
+}
+
+================
+File: hello-world.js
+================
+// Simple test function
+exports.handler = async function(event, context) {
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ message: "Hello, World!" }),
+  };
+};
+
+================
+File: package.json
+================
+{
+  "name": "bekuto3d-netlify-functions",
+  "version": "1.0.0",
+  "description": "Serverless functions for bekuto3d",
+  "type": "module",
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "jimp": "^1.6.0",
+    "node-fetch": "^3.3.2",
+    "potrace": "^2.1.8"
+  }
+}
+
+================
+File: server.js
+================
+import express from 'express';
+import cors from 'cors';
+import bodyParser from 'body-parser';
+import potrace from 'potrace';
+import * as Jimp from 'jimp';
+import fs from 'fs';
+import path from 'path';
+import { promisify } from 'util';
+import { fileURLToPath } from 'url';
+
+// Get __dirname equivalent in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Promisify potrace.trace
+const potraceAsync = promisify(potrace.trace);
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middleware
+app.use(cors());
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(express.static(path.join(__dirname, '../../dist')));
+
+// Endpoint pro převod base64 obrázku na SVG
+app.post('/api/convert-to-svg', async (req, res) => {
+  try {
+    const { imageData, options } = req.body;
+
+    if (!imageData) {
+      return res.status(400).json({ error: 'Image data is required' });
+    }
+
+    // Odstranit prefix 'data:image/png;base64,' pokud existuje
+    const base64Data = imageData.replace(/^data:image\/\w+;base64,/, '');
+
+    // Vytvořit buffer z base64 dat
+    const buffer = Buffer.from(base64Data, 'base64');
+
+    // Načíst obrázek pomocí Jimp
+    const image = await Jimp.read(buffer);
+
+    // Upravit obrázek pro lepší výsledky
+    image.greyscale().contrast(0.8);
+
+    // Převést na buffer pro potrace
+    const processedBuffer = await image.getBufferAsync(Jimp.MIME_PNG);
+
+    // Nastavení potrace
+    const potraceOptions = {
+      turdSize: options?.turdSize || 2,
+      turnPolicy: options?.turnPolicy || potrace.Potrace.TURNPOLICY_MINORITY,
+      alphaMax: options?.alphaMax || 1,
+      optCurve: options?.optCurve !== undefined ? options?.optCurve : true,
+      optTolerance: options?.optTolerance || 0.2,
+      threshold: options?.threshold || 128,
+      blackOnWhite: options?.blackOnWhite !== undefined ? options?.blackOnWhite : true,
+      color: options?.color || '#000000',
+      background: options?.background || '#FFFFFF'
+    };
+
+    // Použít potrace pro převod na SVG
+    const svg = await potraceAsync(processedBuffer, potraceOptions);
+
+    // Vrátit SVG
+    res.json({ svg });
+  } catch (error) {
+    console.error('Error converting image to SVG:', error);
+    res.status(500).json({ error: 'Failed to convert image to SVG' });
+  }
+});
+
+// Spustit server
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+
+
+
+================================================================
+End of Codebase
+================================================================

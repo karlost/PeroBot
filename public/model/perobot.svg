@@ -1,0 +1,34 @@
+<svg width="500" height="500" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g clip-path="url(#clip0_1089_819)">
+    <path d="M382.812 0H117.188C52.4666 0 0 52.4666 0 117.188V382.812C0 447.533 52.4666 500 117.188 500H382.812C447.533 500 500 447.533 500 382.812V117.188C500 52.4666 447.533 0 382.812 0Z" fill="#2D2D2D"/>
+    
+    <!-- Pen/Brush Icon -->
+    <path d="M350 120C350 120 320 150 280 190C240 230 200 270 180 290C160 310 140 330 130 340C120 350 110 360 100 370C90 380 80 390 75 395C70 400 65 405 60 410" stroke="#FF6B6B" stroke-width="20" stroke-linecap="round"/>
+    
+    <!-- Pen Tip -->
+    <path d="M60 410C55 415 50 420 45 425C40 430 35 435 30 440C25 445 20 450 15 455C10 460 5 465 0 470" stroke="#FF6B6B" stroke-width="25" stroke-linecap="round"/>
+    
+    <!-- Robot Face -->
+    <circle cx="250" cy="250" r="100" fill="#4ECDC4"/>
+    <circle cx="210" cy="220" r="15" fill="white"/>
+    <circle cx="290" cy="220" r="15" fill="white"/>
+    <path d="M220 280C220 280 240 300 280 280" stroke="white" stroke-width="8" stroke-linecap="round"/>
+    
+    <!-- Robot Antenna -->
+    <path d="M250 150C250 150 250 130 250 120C250 110 250 100 250 90" stroke="#FF6B6B" stroke-width="10" stroke-linecap="round"/>
+    <circle cx="250" cy="80" r="15" fill="#FF6B6B"/>
+    
+    <!-- Robot Body Outline -->
+    <rect x="150" y="350" width="200" height="100" rx="20" stroke="#FF6B6B" stroke-width="10" fill="#4ECDC4"/>
+    
+    <!-- Robot Controls -->
+    <circle cx="200" cy="400" r="15" fill="#FF6B6B"/>
+    <circle cx="250" cy="400" r="15" fill="#FF6B6B"/>
+    <circle cx="300" cy="400" r="15" fill="#FF6B6B"/>
+  </g>
+  <defs>
+    <clipPath id="clip0_1089_819">
+      <rect width="500" height="500" rx="120" fill="white"/>
+    </clipPath>
+  </defs>
+</svg>

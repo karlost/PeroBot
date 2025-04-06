@@ -1,0 +1,19 @@
+<svg width="500" height="500" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="500" height="500" rx="120" fill="#4ECDC4"/>
+
+  <!-- Pen/Brush Icon -->
+  <path d="M350 120C350 120 320 150 280 190C240 230 200 270 180 290C160 310 140 330 130 340C120 350 110 360 100 370C90 380 80 390 75 395C70 400 65 405 60 410" stroke="#FF6B6B" stroke-width="20" stroke-linecap="round"/>
+
+  <!-- Pen Tip -->
+  <path d="M60 410C55 415 50 420 45 425C40 430 35 435 30 440C25 445 20 450 15 455C10 460 5 465 0 470" stroke="#FF6B6B" stroke-width="25" stroke-linecap="round"/>
+
+  <!-- Robot Face Simple -->
+  <circle cx="250" cy="250" r="80" fill="#2D2D2D"/>
+  <circle cx="220" cy="230" r="12" fill="white"/>
+  <circle cx="280" cy="230" r="12" fill="white"/>
+  <path d="M230 270C230 270 245 285 270 270" stroke="white" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- Robot Antenna -->
+  <path d="M250 170C250 170 250 155 250 145" stroke="#FF6B6B" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="250" cy="135" r="12" fill="#FF6B6B"/>
+</svg>
