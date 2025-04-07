@@ -1,4 +1,4 @@
-import ImageTracer from 'imagetracerjs' // Import ImageTracer
+// Import ImageTracer
 import { ref } from 'vue'
 
 // Removed unused helper function base64ToImageData
@@ -167,7 +167,9 @@ export function useGeminiSvgGenerator() {
           imageBase64 = serverData.imageData
           generatedImageBase64.value = `data:image/png;base64,${imageBase64}`
 
-          // Convert PNG to vector SVG using imagetracerjs
+          // Server now handles the conversion, just use the received svgContent
+          // The following client-side conversion code is removed.
+          /*
           try {
             const imageDataUri = `data:image/png;base64,${imageBase64}`
             // No need to convert to ImageData, imagetracerjs accepts data URI
@@ -216,10 +218,15 @@ export function useGeminiSvgGenerator() {
             // Use fallback SVG on conversion error
             svgContent = createFallbackSvg(prompt)
           }
+          */
+          // If server returned imageData but not svgContent (which shouldn't happen with the updated server function)
+          // create a fallback or error SVG.
+          console.error('Server returned image data but no SVG content. Using fallback.')
+          svgContent = createErrorSvg(prompt, 'Conversion failed on server')
         }
         else {
-          console.error('No image or SVG data received from the server') // Keep console.error
-          svgContent = createErrorSvg(prompt, 'No image or SVG data received')
+          console.error('No SVG content received from the server') // Keep console.error
+          svgContent = createErrorSvg(prompt, 'No SVG data received')
         }
       }
 
