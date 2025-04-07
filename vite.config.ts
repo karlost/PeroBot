@@ -11,6 +11,7 @@ import { VueRouterAutoImports } from 'unplugin-vue-router'
 
 import VueRouter from 'unplugin-vue-router/vite'
 import { defineConfig } from 'vite'
+import vercel from 'vite-plugin-vercel' // Import the plugin
 
 export default defineConfig({
   optimizeDeps: {
@@ -78,7 +79,13 @@ export default defineConfig({
     // https://github.com/antfu/unocss
     // see uno.config.ts for config
     UnoCSS(),
+
+    // Add Vercel plugin (should auto-detect /api)
+    vercel(),
   ],
+
+  // Optional Vercel config (add if needed based on plugin docs)
+  vercel: {},
 
   // https://github.com/vitest-dev/vitest
   test: {

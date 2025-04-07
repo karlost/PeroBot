@@ -1,4 +1,7 @@
+import ImageTracer from 'imagetracerjs' // Import ImageTracer
 import { ref } from 'vue'
+
+// Removed unused helper function base64ToImageData
 
 export function useGeminiSvgGenerator() {
   const isGenerating = ref(false)
@@ -29,8 +32,8 @@ export function useGeminiSvgGenerator() {
 
       if (isDevelopment && false) { // Set to false to always use serverless function
         // DEVELOPMENT MODE - Call Gemini API directly (for testing only)
-        console.log('DEV MODE: Calling Gemini API directly for testing purposes')
-        
+        // console.log('DEV MODE: Calling Gemini API directly for testing purposes') // Removed console.log
+
         // Direct API call implementation
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key=${apiKey.value}`
 
@@ -39,14 +42,14 @@ export function useGeminiSvgGenerator() {
             {
               parts: [
                 {
-                  text: `Create a minimalist black and white lineart illustration of ${prompt}, contained within a perfect circle with thick border. Use clean continuous lines suitable for 3D printing as wall art with bold outlines, negative space, and the same graphic style as the reference image - high contrast, simplified shapes, and subtle background elements to create depth. The ${prompt} should be the main focus in the center of the circular composition.`
-                }
-              ]
-            }
+                  text: `Create a minimalist black and white lineart illustration of ${prompt}, contained within a perfect circle with thick border. Use clean continuous lines suitable for 3D printing as wall art with bold outlines, negative space, and the same graphic style as the reference image - high contrast, simplified shapes, and subtle background elements to create depth. The ${prompt} should be the main focus in the center of the circular composition.`,
+                },
+              ],
+            },
           ],
           generationConfig: {
-            responseModalities: ["Text", "Image"]
-          }
+            responseModalities: ['Text', 'Image'],
+          },
         }
 
         const apiResponse = await fetch(url, {
@@ -68,7 +71,7 @@ export function useGeminiSvgGenerator() {
         if (apiData.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data) {
           imageBase64 = apiData.candidates[0].content.parts[0].inlineData.data
           generatedImageBase64.value = `data:image/png;base64,${imageBase64}`
-          
+
           // Try to convert using local potrace server
           try {
             const potraceResponse = await fetch('http://localhost:3000/api/convert-to-svg', {
@@ -84,83 +87,136 @@ export function useGeminiSvgGenerator() {
                   threshold: 128,
                   blackOnWhite: true,
                   color: '#000000',
-                  background: '#FFFFFF'
-                }
+                  background: '#FFFFFF',
+                },
               }),
             })
 
             if (potraceResponse.ok) {
               const potraceData = await potraceResponse.json()
               svgContent = potraceData.svg
-            } else {
+            }
+            else {
               throw new Error(`Potrace server error: ${potraceResponse.status}`)
             }
-          } catch (error) {
+          }
+          catch (error) {
             console.error('Error converting PNG to SVG using local server:', error)
             // Use fallback SVG
             svgContent = createFallbackSvg(prompt)
           }
-        } else {
-          console.error('No image data found in Gemini API response')
+        }
+        else {
+          console.error('No image data found in Gemini API response') // Keep console.error
           svgContent = createErrorSvg(prompt, 'API did not return an image')
         }
-      } else {
+      }
+      else {
         // PRODUCTION MODE - Use serverless function
-        console.log('PROD MODE: Using serverless function to generate SVG')
-        
+        // console.log('PROD MODE: Using serverless function to generate SVG') // Removed console.log
+
         // Determine which serverless function endpoint to use based on deployment platform
         const apiEndpoint = window.location.hostname.includes('netlify')
           ? '/.netlify/functions/generate-svg-from-prompt'
-          : '/api/generate-svg-from-prompt';
-        
-        console.log('Using API endpoint:', apiEndpoint);
-        
+          : '/api/generate-svg-from-prompt'
+
+        // console.log('Using API endpoint:', apiEndpoint); // Removed console.log
+
         const serverResponse = await fetch(apiEndpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             prompt,
-            apiKey: apiKey.value
+            apiKey: apiKey.value,
           }),
         })
-        
+
         if (!serverResponse.ok) {
           const errorText = await serverResponse.text()
           throw new Error(`Server error: ${serverResponse.status} ${errorText}`)
         }
-        
+
         const serverData = await serverResponse.json()
-        console.log('Server response:', serverData)
-        
+        // console.log('Server response:', serverData) // Removed console.log
+
         if (serverData.svgContent) {
-          console.log('SVG content received from server')
+          // console.log('SVG content received from server') // Removed console.log
           svgContent = serverData.svgContent
-        } else if (serverData.imageData) {
-          console.log('Image data received from server, creating SVG wrapper')
+        }
+        else if (serverData.imageData) {
+          // console.log('Image data received from server, creating SVG wrapper') // Removed console.log
+          // console.log('Image data received from server, converting to vector SVG using potrace-js...') // This log was already removed in previous step
           imageBase64 = serverData.imageData
           generatedImageBase64.value = `data:image/png;base64,${imageBase64}`
-          
-          // Create SVG wrapper for the image
-          svgContent = `
-            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512">
-              <image width="512" height="512" xlink:href="data:image/png;base64,${imageBase64}" />
-            </svg>
-          `.trim()
-        } else {
-          throw new Error('No image or SVG data received from the server')
+
+          // Convert PNG to vector SVG using imagetracerjs
+          try {
+            const imageDataUri = `data:image/png;base64,${imageBase64}`
+            // No need to convert to ImageData, imagetracerjs accepts data URI
+
+            // Define options for imagetracerjs (adjust as needed)
+            // Refer to imagetracerjs documentation for details
+            const options = {
+              ltres: 1, // Error threshold for straight lines
+              qtres: 1, // Error threshold for quadratic splines
+              pathomit: 8, // Path simplification threshold
+              rightangleenhance: true, // Enhance right angles
+              // Colors for color quantization (if needed, default is black/white)
+              // colorsampling: 1,
+              // numberofcolors: 2,
+              // mincolorratio: 0.02,
+              // colorquantcycles: 3,
+              // Layering options (if needed)
+              // layerseparator: '_',
+              // scale: 1,
+              // roundcoords: 1,
+              viewbox: true, // Add viewBox attribute
+              desc: false, // Add description element
+              // Blur options (if needed)
+              // blurradius: 0,
+              // blurdelta: 20
+            }
+
+            // console.log('Starting imagetracerjs conversion...'); // Removed console.log
+            // Perform the conversion
+            svgContent = await new Promise<string>((resolve) => {
+              // Use imageToSVG to directly get the SVG string
+              // Note: imagetracerjs might not be strictly Promise-based, using callback
+              ImageTracer.imageToSVG(
+                imageDataUri, // Pass the data URI directly
+                (svgString: string) => {
+                  // console.log('imagetracerjs conversion successful.'); // Removed console.log
+                  resolve(svgString)
+                },
+                options,
+              )
+            })
+          }
+          catch (tracerError) {
+            console.error('Error converting PNG to SVG using imagetracerjs:', tracerError)
+            generationError.value = tracerError instanceof Error ? tracerError.message : 'ImageTracer conversion failed'
+            // Use fallback SVG on conversion error
+            svgContent = createFallbackSvg(prompt)
+          }
+        }
+        else {
+          console.error('No image or SVG data received from the server') // Keep console.error
+          svgContent = createErrorSvg(prompt, 'No image or SVG data received')
         }
       }
-      
+
       return svgContent
-    } catch (error) {
-      console.error('Error generating SVG:', error)
+    }
+    catch (error) {
+      console.error('Error generating SVG:', error) // Keep console.error
       generationError.value = error instanceof Error ? error.message : 'Unknown error'
       throw error
-    } finally {
+    }
+    finally {
       isGenerating.value = false
     }
   }
-  
+
   // Helper function to create a fallback SVG
   function createFallbackSvg(prompt: string): string {
     return `
@@ -176,7 +232,7 @@ export function useGeminiSvgGenerator() {
       </svg>
     `.trim()
   }
-  
+
   // Helper function to create an error SVG
   function createErrorSvg(prompt: string, errorMessage: string): string {
     return `
