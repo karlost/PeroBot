@@ -125,28 +125,34 @@ export default async (req, res) => {
 
     let svgContent
     try {
+      console.error('Starting ImageTracer conversion...') // Use console.error for logging
       // imagetracerjs expects a callback, wrap in a Promise for async/await
       svgContent = await new Promise((resolve, reject) => {
+        const timeoutId = setTimeout(() => { // Define timeoutId here
+          console.error('ImageTracer conversion timed out after 9 seconds') // Log timeout
+          reject(new Error('ImageTracer conversion timed out after 9 seconds'))
+        }, 9000) // Slightly less than Vercel's 10s limit
+
         ImageTracer.imageToSVG(
           imageDataUri,
           (svgString) => {
+            clearTimeout(timeoutId) // Clear the timeout if conversion succeeds
             if (svgString) {
+              console.error('ImageTracer conversion successful. SVG length:', svgString.length) // Use console.error for logging
               resolve(svgString)
             }
             else {
+              console.error('ImageTracer returned empty SVG string') // Keep console.error
               reject(new Error('ImageTracer returned empty SVG string'))
             }
           },
           options,
         )
-        // Add a timeout mechanism in case imagetracerjs hangs
-        setTimeout(() => {
-          reject(new Error('ImageTracer conversion timed out'))
-        }, 9000) // Slightly less than Vercel's 10s limit
+        // Removed the duplicate setTimeout from here
       })
     }
     catch (tracerError) {
-      console.error('Error converting PNG to SVG using imagetracerjs in serverless function:', tracerError)
+      console.error('Error during ImageTracer conversion promise:', tracerError) // Log specific catch block
       // Return a fallback or error indicator if conversion fails
       return res.status(500).json({ error: 'SVG conversion failed', details: tracerError.message })
     }
